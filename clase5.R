@@ -1,7 +1,7 @@
 library(tidyverse)
 
-theta <- 1/3 # Probabilidad de un exito
-n <- 50 # Ensayos
+theta <- 1/4 # Probabilidad de un exito
+n <- 10 # Ensayos
 
 # Variable aleatoria, posibles exitos en n ensayos
 x <- 0:n
@@ -42,19 +42,19 @@ sd_x <- standard_deviation(theta, esperanza)
 prob_aprob <- sum(p_dist[x >= 6])
 prob_repr <- sum(p_dist[x < 6])
 
-plot(x[x>=6],
-     p_dist[x>=6],
-     ylim = c(0,.35),
-     xlim = c(0,n),
-     type = 'h', lwd = 5, col = 'darkgreen')
-lines(x[x<6],
-      p_dist[x<6],
-      type = 'h', lwd = 5, col = 'red'
-      )
-text(6, .10, paste(round(prob_aprob, 4)), col = "darkgreen", cex = 1.4)
-text(5, .30, paste(round(prob_repr, 4)), col = "red", cex = 1.4)
-mtext('Distribucion binomial', 3, line=2, col='blue')
-mtext(paste('Aprobar un examen de ', n, ' aciertos con prob. exito de ', theta), 3, line=.5, col='red')
+# plot(x[x>=6],
+#      p_dist[x>=6],
+#      ylim = c(0,.35),
+#      xlim = c(0,n),
+#      type = 'h', lwd = 5, col = 'darkgreen')
+# lines(x[x<6],
+#       p_dist[x<6],
+#       type = 'h', lwd = 5, col = 'red'
+#       )
+# text(6, .10, paste(round(prob_aprob, 4)), col = "darkgreen", cex = 1.4)
+# text(5, .30, paste(round(prob_repr, 4)), col = "red", cex = 1.4)
+# mtext('Distribucion binomial', 3, line=2, col='blue')
+# mtext(paste('Aprobar un examen de ', n, ' aciertos con prob. exito de ', theta), 3, line=.5, col='red')
 
 
 # Pendiente graficar en ggplot la grafica anterior
@@ -65,6 +65,7 @@ graded_data <- mutate(
   )
 ggplot(data = graded_data, aes(x = x, y = p_dist)) +
   geom_bar(mapping = aes(fill = passing), stat = "identity", width = .5) +
-  ylim(0, theta) +
+  ylim(0, max(p_dist) + .05) +
   scale_x_continuous(breaks = x) +
   labs(title = "Distribucion binomial", x = "Aciertos", y = "Probabilidad")
+max(p_dist)
