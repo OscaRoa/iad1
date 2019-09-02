@@ -23,21 +23,25 @@ binomial_dist <- function(n, theta, x) {
   return(distribution)
 }
 
-expected_value <- function(x, theta) {
-  # Esperanza matematica distribucion binomial
-  return(x*theta)
+expected_value <- function(x, p_dist) {
+  # Esperanza matematica
+  # La suma de cada uno de los valores de la distribucion 
+  # por su valor en la distribucion de probabilidad
+  return(sum(x*p_dist))
 }
 
-standard_deviation <- function(theta, e_x) {
-  # Desviacion estandar distribucion binomial
-  v <- e_x*(1 - theta)  # Varianza
+standard_deviation <- function(x, e_x, p_dist) {
+  # Desviacion estandar
+  # La suma del producto de cada valor de la distribucion de probabilidad
+  # por la diferencia cuadrada de la esperanza y de cada valor de la dist.
+  v <- sum(p_dist*(e_x - x)**2)  # Varianza
   return(v**(1/2))
 }
 
 # Guardar el vector de la distribucion para graficarlo posteriormente
 p_dist <- binomial_dist(n, theta, x)
-esperanza <- expected_value(n, theta)
-sd_x <- standard_deviation(theta, esperanza)
+esperanza <- expected_value(x, p_dist)
+sd_x <- standard_deviation(x, esperanza, p_dist)
 
 tibb_data <- tibble(x, p_dist)
 ggplot(data = tibb_data, aes(x = x, y = p_dist)) +
