@@ -9,7 +9,9 @@ k <- 6 # Tamaño de la extraccion (de la muestra) sin remplazo
 # esta resta puede dar un negativo; para el límite superior, se toma el mínimo
 # entre el tamaño de la muestra o el total de éxitos que hay en población, ya que
 # el número de éxitos no puede exceder al tamaño de la muestra
-x <- max(c(0, k-n)):min(c(k, m))
+upper_limit <- min(c(k, m))
+lower_limit <- max(c(0, k-n))
+x <- lower_limit:upper_limit
 
 
 coef_bin <- function(a,b) {
@@ -32,6 +34,9 @@ hipergeom_dist <- function(x, m, n, k) {
 
 p_dist <- hipergeom_dist(x, m, n, k)
 
-plot(x, p_dist, type = "h", lwd = 1.5, xlim = c(0, max(x)), ylim = c(0, max(p_dist)))
+plot(x, p_dist,
+     type = "h", lwd = 1.5,
+     xlim = c(0, upper_limit), ylim = c(0, max(p_dist))
+     )
 mtext("Distribución hipergeométrica", 3, line = 2, col = "blue")
 mtext(paste("Aciertos m =", m, "; Fracasos n =", n, "; Muestra k =", k), 3, line = .5)
