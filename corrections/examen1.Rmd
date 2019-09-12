@@ -1,0 +1,599 @@
+---
+title: "Ejercicios de Práctica sobre Teoría de Probabilidad"
+subtitle: "Investigación y Análisis de Datos I"
+author: "Facultad de Psicología, UNAM"
+date: "Septiembre 9, 2019"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+## Solución
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+*a. Con base en la siguiente distribución sobre la variable $H$, calcula:*
+
+| $h$ | $P(H=h)$ |
+|:---:|:---:|
+|1|$5/24$|
+|2|$2/24$|
+|3|$4/24$|
+|4|$7/24$|
+|5|$3/24$|
+|6|$3/24$|
+
+
+**1.** 
+$$
+\begin{aligned}
+P(H<3)&=P(H=1 \cup H=2)\\
+&=P(H=1)+P(H=2)\\
+&=5/24+2/24\\
+&=7/24\approx0.29
+\end{aligned}
+$$
+
+**2.** 
+$$
+\begin{aligned}
+P(H\geq4)&=P(H=4\cup H=5 \cup H=6)\\
+&=P(H=4)+P(H=5)+P(H=6)\\
+&=(7+3+3)/24\\
+&=13/24\approx0.54
+\end{aligned}
+$$
+
+**3.** 
+$$
+\begin{aligned}
+P(2\leq H <5)&=P(H=2\cup H=3\cup H=4)\\
+&=P(H=2)+P(H=3)+P(H=4)\\
+&=(2+4+7)/24\\
+&=13/24\approx0.54
+\end{aligned}
+$$
+
+**4.** 
+$$
+\begin{aligned}
+E(H)&=\sum h*P(H=h)\\
+&=1*(5/24)+2*(2/24)+3*(4/24)+4*(7/24)+5*(3/24)+6*(3/24)\\
+&=(5+4+12+28+15+18)/24\\
+&=82/24\approx3.42
+\end{aligned}
+$$
+
+\newpage
+
+*Resolviendo con `R` los ejercicios 1-4:*
+
+```{r}
+rm(list=ls())
+h <- 1:6
+P_h <- c(5,2,4,7,3,3)/24
+
+# Ej 1.
+sum(P_h[h<3])
+
+# Ej 2.
+sum(P_h[h>=4])
+
+# Ej 3. La condición dentro de los [] se lee "h mayor o igual a dos Y h menor que cinco"
+sum(P_h[h>=2&h<5])
+
+# Ej 4.
+sum(P_h*h)
+```
+
+\newpage
+
+*b. Con base en la siguiente distribución conjunta entre las variables $Z$ y $Q$, calcula:*
+
+|$P(Z=z,Q=q)$|$Q=5$|$Q=6$|$Q=7$|$Q=8$|$Q=9$|
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|$Z=23$|$5/60$|$4/60$|$4/60$|$3/60$|$6/60$|
+|$Z=24$|$4/60$|$2/60$|$3/60$|$3/60$|$2/60$|
+|$Z=25$|$6/60$|$3/60$|$2/60$|$2/60$|$2/60$|
+|$Z=26$|$2/60$|$4/60$|$2/60$|$0/60$|$1/60$|
+
+**5.** La distribución marginal sobre $Q$: $P(Q=q)$:
+
+$$
+\begin{aligned}
+P(Q=q)&=\sum\nolimits_z{P(Z=z,Q=q)}\\\\
+P(Q=5)&=\sum\nolimits_z{P(Z=z,Q=5)}\\
+&=P(Z=23,Q=5)+P(Z=24,Q=5)+P(Z=25,Q=5)+P(Z=26,Q=5)\\
+&=5/60+4/60+6/60+2/60\\
+&=17/60\approx0.28\\\\
+P(Q=6)&=\sum\nolimits_z{P(Z=z,Q=6)}\\
+&=(4+2+3+4)/60\\
+&=13/60\approx0.22\\\\
+P(Q=7)&=\sum\nolimits_z{P(Z=z,Q=7)}\\
+&=(4+3+2+2)/60\\
+&=11/60\approx0.18\\\\
+P(Q=8)&=\sum\nolimits_z{P(Z=z,Q=8)}\\
+&=(3+3+2+0)/60\\
+&=8/60\approx0.13\\\\
+P(Q=9)&=\sum\nolimits_z{P(Z=z,Q=9)}\\
+&=(6+2+2+1)/60\\
+&=11/60\approx0.18
+\end{aligned}
+$$
+\newpage
+
+**6.** La distribución marginal sobre $Z$: $P(Z=z)$:
+
+$$
+\begin{aligned}
+P(Z=z)&=\sum\nolimits_q{P(Z=z,Q=q)}\\\\
+P(Z=23)&=\sum\nolimits_q{P(Z=23,Q=q)}\\
+&=P(Z=23,Q=5)+P(Z=23,Q=6)+P(Z=23,Q=7)+P(Z=23,Q=8)+P(Z=23,Q=9)\\
+&=5/60+4/60+4/60+3/60+6/60\\
+&=22/60\approx0.37\\\\
+P(Z=24)&=\sum\nolimits_q{P(Z=24,Q=q)}\\
+&=(4+2+3+3+2)/60\\
+&=14/60\approx0.23\\\\
+P(Z=25)&=\sum\nolimits_q{P(Z=25,Q=q)}\\
+&=(6+3+2+2+2)/60\\
+&=15/60=0.25\\\\
+P(Z=26)&=\sum\nolimits_q{P(Z=26,Q=q)}\\
+&=(2+4+2+0+1)/60\\
+&=9/60=0.15
+\end{aligned}
+$$
+**7.** La distribución condicional $P(Q=q|Z=24)$:
+$$
+\begin{aligned}
+P(Q=q|Z=z)&=\frac{P(Z=z,Q=q)}{P(Z=z)}\\\\
+P(Q=5|Z=24)&=\frac{P(Z=24,Q=5)}{P(Z=24)}=\frac{\frac{4}{60}}{\frac{14}{60}}=\frac{4}{14}\approx0.28\\\\
+P(Q=6|Z=24)&=\frac{P(Z=24,Q=6)}{P(Z=24)}=\frac{\frac{2}{60}}{\frac{14}{60}}=\frac{2}{14}\approx0.14\\\\
+P(Q=7|Z=24)&=\frac{P(Z=24,Q=7)}{P(Z=24)}=\frac{\frac{3}{60}}{\frac{14}{60}}=\frac{3}{14}\approx0.21\\\\
+P(Q=8|Z=24)&=\frac{P(Z=24,Q=8)}{P(Z=24)}=\frac{\frac{3}{60}}{\frac{14}{60}}=\frac{3}{14}\approx0.21\\\\
+P(Q=9|Z=24)&=\frac{P(Z=24,Q=9)}{P(Z=24)}=\frac{\frac{2}{60}}{\frac{14}{60}}=\frac{2}{14}\approx0.14\\\\
+\end{aligned}
+$$
+
+**8.** La distribución condicional $P(Z=z|Q=8)$:
+$$
+\begin{aligned}
+P(Z=z|Q=q)&=\frac{P(Z=z,Q=q)}{P(Q=q)}\\\\
+P(Z=23|Q=8)&=\frac{P(Z=23,Q=8)}{P(Q=8)}=\frac{\frac{3}{60}}{\frac{8}{60}}=\frac{3}{8}=0.375\\\\
+P(Z=24|Q=8)&=\frac{P(Z=24,Q=8)}{P(Q=8)}=\frac{\frac{3}{60}}{\frac{8}{60}}=\frac{3}{8}=0.375\\\\
+P(Z=25|Q=8)&=\frac{P(Z=25,Q=8)}{P(Q=8)}=\frac{\frac{2}{60}}{\frac{8}{60}}=\frac{2}{8}=0.25\\\\
+P(Z=26|Q=8)&=\frac{P(Z=26,Q=8)}{P(Q=8)}=\frac{\frac{0}{60}}{\frac{8}{60}}=\frac{0}{8}=0\\\\
+\end{aligned}
+$$
+
+*Resolviendo con `R` los ejercicios 5-8:*
+
+```{r}
+rm(list=ls())
+
+# Posibles valores de las variables aleatorias:
+Q <- c(5,6,7,8,9)
+Z <- c(23,24,25,26)
+
+# La siguiente instrucción genera una matriz en blanco... 
+P_QZ <- array(dim=c(length(Z), # ...con tantos renglones como elementos en Z...
+                    length(Q))) # ...y tantas columnas como elementos en Q.
+
+# Examinando el contenido de dicha matriz hasta ahora:
+P_QZ
+
+# Llenando la matriz con la información de la conjunta:
+P_QZ[1,1] <- 5/60
+P_QZ[1,2] <- 4/60
+P_QZ[1,3] <- 4/60
+P_QZ[1,4] <- 3/60
+P_QZ[1,5] <- 6/60
+P_QZ[2,1] <- 4/60
+P_QZ[2,2] <- 2/60
+P_QZ[2,3] <- 3/60
+P_QZ[2,4] <- 3/60
+P_QZ[2,5] <- 2/60
+P_QZ[3,1] <- 6/60
+P_QZ[3,2] <- 3/60
+P_QZ[3,3] <- 2/60
+P_QZ[3,4] <- 2/60
+P_QZ[3,5] <- 2/60
+P_QZ[4,1] <- 2/60
+P_QZ[4,2] <- 4/60
+P_QZ[4,3] <- 2/60
+P_QZ[4,4] <- 0/60
+P_QZ[4,5] <- 1/60
+
+# Examinando la matriz de nuevo:
+P_QZ
+
+# La librería MASS contiene la función 'as.fractions', para expresar
+# los decimales como fracciones:
+library('MASS')
+as.fractions(P_QZ)
+
+# Distribuciones Marginales
+
+# Ej 5. Distribución marginal sobre Q
+P_Q <- array(dim=length(Q))
+# P_Q es un objeto vacío de una sola dimensión: tantas posiciones como
+# elementos en Q:
+P_Q
+
+# Para calcular la probabilidad marginal de un caso específico
+# de Q, digamos P(Q=6):
+
+# "¿En qué posición del vector Q se encuentra el valor 6?"
+which(Q==6) 
+
+# "¿Cuáles son las entradas de la conjunta con ese valor de Q?"
+# (Son 4 porque es posible combinar ese valor de Q con 4 valores
+# posibles de Z.)
+P_QZ[,which(Q==6)] 
+
+# "¿Cuánto suma esa COLUMNA?"
+sum(P_QZ[,which(Q==6)]) 
+
+# Guarda el valor de esa suma en la posición correspondiente del
+# vector marginal P_Q:
+P_Q[which(Q==6)] <- sum(P_QZ[,which(Q==6)])
+
+# Examinando P_Q de nuevo:
+P_Q
+
+# Para llenar todas las posiciones de P_Q es necesario repetir las
+# instrucciones anteriores sustituyendo cada posible valor de Q en lugar
+# del 6. 
+# Una manera compacta de repetir este tipo de operaciones consiste
+# en utilizar un ciclo 'for', que se lee: "para cada valor 'q' en el vector Q,
+# identifica la COLUMNA de la conjunta que corresponde a ese valor de Q,
+# súmala, y manda el resultado al vector marginal P_Q en la posición
+# correspondiente":
+for(q in Q){
+  P_Q[which(Q==q)] <- sum(P_QZ[,which(Q==q)])
+}
+
+# Examinando P_Q de nuevo:
+P_Q
+
+# Ej 6. Distribución marginal sobre Z
+# La idea es la misma, pero en lugar de examinar columnas de
+# la conjunta es necesario sumar RENGLONES, lo cual se consigue
+# cambiando la posición de la coma en la instruccion dentro del 
+# ciclo 'for', en los [] de la conjunta:
+P_Z <- array(dim=length(Z))
+for(z in Z){
+  P_Z[which(Z==z)] <- sum(P_QZ[which(Z==z),])
+}
+
+# Examinando P_Z:
+P_Z
+
+# Redondeando los dos vectores marginales (con 2 posiciones decimales
+# de precisión) reproducimos el resultado en el texto:
+round(P_Q,2)
+round(P_Z,2)
+
+# Ej 7. Distribución condicional sobre Q dado Z=24:
+# "Divide cada entrada del RENGLÓN de la conjunta que corresponde con Z=24
+# entre el valor de la marginal de Z que corresponde con Z=24".
+# El resultado tiene 5 entradas porque Q tiene 5 valores posibles:
+P_QZ[which(Z==24),]/P_Z[which(Z==24)]
+
+# Ej 8. Distribución condicional sobre Z dado Q=8:
+# "Divide cada valor en la COLUMNA de la conjunta que corresponde con Q=8
+# entre el valor de la marginal de Q que corresponde con Q=8":
+# El resultado tiene 4 entradas porque Z tiene 4 valores posibles:
+P_QZ[,which(Q==8)]/P_Q[which(Q==8)]
+
+
+```
+
+**9.** Decide si las variables $Q$ y $Z$ son independientes y argumenta **detalladamente** tu respuesta.
+
+*Las variables $Q$ y $Z$ **no** son independientes porque, como los cuatro ejercicios anteriores demuestran, al menos una condicional sobre $Q$ no es igual a la marginal sobre $Q$: $P(Q|Z=24)\neq P(Q)$, y al menos una condicional sobre $Z$ no es igual a la marginal sobre $Z$: $P(Z|Q=8)\neq P(Z)$.*
+
+*Para que las variables sean independientes, cualquier distribución condicional sobre $Q$ debe ser igual a la marginal sobre $Q$, i.e., se debe cumplir $P(Q|Z=z)=P(Q)$ para todos los valores $z$, y cualquier condicional sobre $Z$ debe ser igual a la marginal sobre $Z$, i.e., $P(Z|Q=q)=P(Z)$ para cualquier valor $q$.*
+
+\newpage
+
+*c. A continuación se presentan las distribuciones marginales sobre las variables G y W:*
+
+|$g$|11|12|13|14|
+|:-:|:-:|:-:|:-:|:-:|
+|$P(G=g)$|$\frac{4}{8}$|$\frac{2}{8}$|$\frac{1}{8}$|$\frac{1}{8}$| 
+
+|$w$|4|5|6|
+|:-:|:-:|:-:|:-:|
+|$P(W=w)$|$\frac{2}{6}$|$\frac{3}{6}$|$\frac{1}{6}$|
+
+**10.** Especifica la distribución conjunta entre $G$ y $W$ suponiendo que las variables son independientes.
+
+*Sabemos que, por definición, podemos expresar la distribución conjunta entre **cualquier** par de variables aleatorias como el producto de la marginal sobre la primera por la condicional sobre la segunda dados los valores de la primera:*
+
+$$
+\begin{aligned}
+P(G=g|W=w)&=\frac{P(G=g,W=w)}{P(W=w)} &&\text{Definición de la condicional sobre G dado cualquier valor de W.}\\\\
+P(W=w)P(G=g|W=w)&=P(G=g,W=w) &&\text{Eq. 1, válida para cualquier par de variables aleatorias,}\\
+&&&\text{sin importar si son independientes o no.}\\
+\end{aligned}
+$$
+
+*El suponer que $G$ y $W$ son independientes quiere decir que la incertidumbre sobre G no cambia incluso habiendo observado algún valor de W (o viceversa), i.e.:* 
+
+$$\begin{aligned}
+P(G=g)=P(G=g|W=w) && \text{Eq. 2, suponiendo independencia entre G y W.} 
+\end{aligned}$$
+
+*Por lo tanto, la distribución conjunta para dos **variables independientes** puede calcularse como el producto de las marginales:* 
+
+$$\begin{aligned}
+P(W=w)P(G=g)&=P(G=g,W=w) &&\text{Sustituyendo la Eq. 2 en la Eq. 1,}\\
+&&&\text{válida únicamente para variables independientes.}\\
+\end{aligned}$$
+
+*Por ejemplo, en este ejercicio la probabilidad de que $G=12$ y $W=5$:*
+
+$$
+\begin{aligned}
+P(G=12,W=5)&=P(G=12)P(W=5)\\\\
+&=\left(\frac{2}{8}\right) \left(\frac{3}{6}\right)=\frac{6}{48}=0.125
+\end{aligned}$$
+
+*Calculando el resto de entradas de la conjunta:*
+
+|$P(G=g,W=w)$|$G=11$|$G=12$|$G=13$|$G=14$|
+|:--:|:--:|:--:|:--:|:--:|
+|$W=4$|$8/48$|$4/48$|$2/48$|$2/48$|
+|$W=5$|$12/48$|$6/48$|$3/48$|$3/48$|
+|$W=6$|$4/48$|$2/48$|$1/48$|$1/48$|
+
+\newpage
+
+*Resolviendo el ejercicio 10 en `R`:*
+```{r}
+rm(list=ls())
+
+# Posibles valores de cada variable (o "soportes" de cada variable):
+G <- c(11,12,13,14)
+W <- c(4,5,6)
+# Distribuciones marginales de cada variable:
+P_G <- c(4,2,1,1)/8
+P_W <- c(2,3,1)/6
+
+# La conjunta es una matriz con tantos renglones como
+# elementos en W, y tantas columnas como elementos en G:
+P_GW <- array(dim=c(length(W),
+                    length(G)))
+
+# Examinando:
+P_GW
+
+# Si queremos llenar la posición específica P(G=12,W=5):
+# El ORDEN de las variables es MUY IMPORTANTE a la hora de llenar
+# el objeto en R: especificamos la posición de W antes de la coma y la de
+# G después de la coma, porque al definir P_GW decidimos que la
+# primera dimensión (renglones) mide lo que mide W, mientras que
+# la segunda (columnas) mide lo que mide G.
+# Asumiendo independencia entre G y W:
+P_GW[which(W==5),which(G==12)] <- P_G[which(G==12)]*P_W[which(W==5)] 
+
+# Examinando la matriz:
+P_GW
+
+# Para llenar el resto de entradas es necesario sustituir cada combinación
+# posible entre G y W, es decir, es necesario tomar un valor de W y ejecutar
+# la instrucción anterior sustituyendo cada valor de G, después pasar al 
+# siguiente valor de W y volver a sustituir cada valor de G, etcétera.
+# Es posible emplear dos ciclos for "anidados" para expresar dichas
+# sustituciones de manera compacta:
+for(w in W){
+  for(g in G){
+    P_GW[which(W==w),which(G==g)] <- P_G[which(G==g)]*P_W[which(W==w)] 
+  }
+}
+
+# Examinando el resultado:
+P_GW
+
+# O, para facilitar la comparación con el resultado en el texto:
+as.fractions(P_GW)
+```
+
+\newpage
+
+*d. La vaquita marina es una especie de cetáceos que habita en el Golfo de California y se encuentra al borde de la extinción. Cierto equipo de conservación decide capturar 8 vaquitas (sin reemplazo) para reproducirlas en cautiverio. Suponiendo que en todo el Golfo únicamente quedan vivas 62 vaquitas hembra y 34 vaquitas macho,*
+
+**11.** especifica la distribución de probabilidad sobre **el número de vaquitas hembra** que el equipo encontrará en la muestra de 8.
+
+$~$
+
+*El número V de vaquitas hembra en la muestra sin reemplazo se distribuye:*
+$$V \sim Hypergeometric(m=62,n=34,k=8),$$
+
+*en donde **m** es el número de éxitos en la población, **n** el número de fracasos, y **k** el tamaño de la muestra. Por lo tanto,*
+$$\begin{aligned}
+V&\in \{ max(0,k-n),...,min(k,m)\}\\
+V&\in \{ max(0,8-34),...,min(8,62)\}\\
+V&\in \{ 0,1,...,7,8\} &&\text{es decir, es posible encontrar desde 0 hasta 8 vaquitas hembra}\\
+&&&\text{en la muestra.}\\
+\end{aligned}
+$$
+*De acuerdo con la Distribución Hipergeométrica, la probabilidad de observar cada posible valor de V se calcula como:*
+$$P(V=v)=\frac{\binom{m}{v}\binom{n}{k-v}}{\binom{m+n}{k}}$$
+*Por ejemplo, para saber qué tan probable es terminar con 5 vaquitas hembra en la muestra:*
+$$\begin{aligned}
+P(V=5)&=\frac{\binom{62}{5}\binom{34}{8-5}}{\binom{96}{8}}\\\\
+&=\frac{(6,471,002)(5,984)}{132,601,016,340}\\\\
+&\approx0.292
+\end{aligned}$$
+
+*Es decir, existen cerca de **seis millones y medio** de maneras de elegir 5 vaquitas hembra de las 62; alrededor de **seis mil maneras** de elegir 3 vaquitas macho de las 34; y poco más de **ciento treinta y dos mil millones** de maneras de elegir 8 vaquitas de las 96 totales. Como trabajar con estas cantidades a lápiz es poco práctico, es recomendable utilizar algún paquete de cómputo estadístico para calcular el resto de la distribución.*
+
+*Resolviendo con `R`:*
+
+```{r}
+rm(list=ls())
+
+# El coeficiente binomial se calcula como:
+coef_bin <- function(a,b){
+  result=factorial(a)/(factorial(b)*(factorial(a-b)))
+  return(result)
+}
+
+# Los parámetros de la distribución:
+m <- 62 # Número de éxitos en la población
+n <- 34 # Número de fracasos en la población
+k <- 8 # Tamaño de la muestra (sin reemplazo)
+
+# Variable aleatoria
+v <- max(c(0,k-n)):min(c(k,m)) # Posibles números de éxitos en la muestra
+
+# Función de masa de probabilidad Hipergeométrica:
+pmf_hyper <- coef_bin(m,v)*coef_bin(n,k-v)/coef_bin(m+n,k)
+
+cbind(v,pmf_hyper)
+
+```
+
+\newpage
+
+*e. El volcán Popocatépetl todavía se encuentra activo. Suponiendo que cada día es 0.15 probable que muestre actividad, y que esta probabilidad se mantiene constante todos los días sin importar la actividad volcánica de los días anteriores,*
+
+**12.** ¿qué tan probable es que transcurran 7 días **o más** antes del siguiente registro de actividad volcánica?
+
+$~$
+
+*El número D de días sin actividad volcánica antes del siguiente día con actividad se distribuye:*
+$$D\sim Geometric(\gamma)$$
+*en donde $\gamma$ es la probabilidad de éxito (observar actividad volcánica) por día. En tanto que la variable D representa el número de días **sin** éxito antes del siguiente día con éxito, es posible que dicha variable alcance valores muy grandes sin un límite superior definido:*
+$$D\in\{0,1,...,\infty\}$$
+*De acuerdo con la Distribución Geométrica, la probabilidad de que la variable D tome cada uno de sus posibles valores está dada por:*
+$$P(D=d)=\gamma(1-\gamma)^d$$
+
+*Calculando los valores de probabilidad para los primeros diez posibles valores de $D$:*
+$$\begin{aligned}
+P(D=0)&=(0.15)(0.85)^0=(0.15)(1.00)\approx0.150\\
+P(D=1)&=(0.15)(0.85)^1=(0.15)(0.85)\approx0.128\\
+P(D=2)&=(0.15)(0.85)^2=(0.15)(0.72)\approx0.108\\
+P(D=3)&=(0.15)(0.85)^3=(0.15)(0.61)\approx0.092\\
+P(D=4)&=(0.15)(0.85)^4=(0.15)(0.52)\approx0.078\\
+P(D=5)&=(0.15)(0.85)^5=(0.15)(0.44)\approx0.066\\
+P(D=6)&=(0.15)(0.85)^6=(0.15)(0.38)\approx0.057\\
+P(D=7)&=(0.15)(0.85)^7=(0.15)(0.32)\approx0.048\\
+P(D=8)&=(0.15)(0.85)^8=(0.15)(0.27)\approx0.040\\
+P(D=9)&=(0.15)(0.85)^9=(0.15)(0.23)\approx0.034\\
+\vdots
+\end{aligned}$$
+
+*Desde luego, podríamos seguir calculando la probabilidad de cada valor de D sin terminar jamás, y de hecho parece que la solución del problema requiere calcular toda la distribución sobre D en tanto que se solicita la probabilidad de que pasen **7 días o más** sin actividad volcánica, es decir, necesitamos la probabilidad de que la variable D sea mayor o igual a 7, o bien, la suma del área negra en la gráfica siguiente, desde $D=7$ hasta $D=\infty$:*
+
+```{r,echo=F}
+plot(NULL,xlim=c(0,25),ylim=c(0,.2),axes=F,ann=F)
+points(7:25,dgeom(7:25,.15),type='h',lwd=5)
+points(0:6,dgeom(0:6,.15),type='h',lwd=5,col='#aaaaaa')
+axis(1,at=0:25,cex.axis=.6,tck=-0.02,padj=-2)
+axis(2,cex.axis=.7,padj=1,tck=-0.02)
+mtext('D',1,line=1.5)
+mtext('P(D=d)',2,line=1.5)
+```
+
+*Para calcular el área negra podemos aprovechar la propiedad más importante de una distribución de probabilidad: sabemos que, en total, el área bajo **toda** la distribución tiene que ser igual a 1, desde $D=0$ hasta $D=\infty$. Por lo tanto, para calcular el área negra en la gráfica basta con calcular el área gris y sustraerla del área total. Formalmente:*
+$$\begin{aligned}
+P(D\geq7)&=1-P(D<7)\\
+&=1-P(D=0\cup D=1\cup D=2\cup D=3\cup D=4\cup D=5\cup D=6)\\
+&=1-(P(D=0)+P(D=1)+P(D=2)+P(D=3)+P(D=4)+P(D=5)+P(D=6))\\
+&=1-(0.150+0.128+0.108+0.092+0.078+0.066+0.057)\\
+&=1-0.679\\
+&\approx0.321
+\end{aligned}$$
+
+*Resolviendo con `R`:*
+```{r}
+rm(list=ls())
+
+# Parámetros
+gamma <- 0.15
+
+# Variable aleatoria
+d <- 0:100 
+# Para este ejercicio basta con que el límite superior del objeto en 'R'  
+# sea mayor que 6 con tal de que el programa pueda calcular la distribución
+# en los valores de la variable aleatoria que son relevantes.
+
+# Función de masa de probabilidad Geométrica:
+fmp_geom <- gamma*(1-gamma)^d
+
+# Examinando la distribución en valores de 'd' menores a 7:
+fmp_geom[d<7]
+
+# Calculando la probabilidad de que 'd' sea mayor o igual a 7:
+1-sum(fmp_geom[d<7])
+```
+
+
+
+
+\newpage
+
+*f. Un agente de ventas debe hacer 15 llamadas para promocionar cierto producto. Si sabe que la probabilidad de que le cuelguen de inmediato es 0.80 por llamada,*
+
+**13.** especifica la distribución de probabilidad sobre el **número de llamadas** en las que le colgarán sin escucharlo asumiendo independencia y distribución idéntica en sus 15 intentos.
+
+$~$
+
+*El número K de llamadas rechazadas se distribuye:*
+$$K\sim Binomial(n=15,\theta=0.8)$$
+*en donde **n** es el número de ensayos **independientes e idénticamente distribuidos** que el agente está por ejecutar, y $\theta$ es la probabilidad de éxito en cada ensayo (en este ejemplo, un éxito es una llamada rechazada porque nos interesa contar el número de ese tipo de llamadas). Por lo tanto,*
+$$\begin{aligned}
+K&\in \{ 0,...,n\}\\
+K&\in \{ 0,1,...,14,15\} &&\text{es decir, es posible que le rechacen desde 0 hasta 15 llamadas.}\\
+\end{aligned}
+$$
+*De acuerdo con la Distribución Binomial, la probabilidad de observar cada posible valor de $K$ se calcula como:*
+$$P(K=k)=\binom{n}{k}\theta^{k}(1-\theta)^{n-k}$$
+*Por ejemplo, para calcular qué tan probable es que le rechacen exactamente 9 llamadas:*
+$$\begin{aligned}
+P(K=9)&=\binom{15}{9}(0.8^{9})(0.2)^{6}\\\\
+&=(5005)(0.1342117)(0.000064)\\\\
+&\approx0.043
+\end{aligned}
+$$
+*Calculando el resto de la distribución con `R`:*
+```{r}
+rm(list=ls())
+
+# Parámetros
+n=15 # Número de ensayos binarios independientes e idénticamente distribuidos
+theta=0.8 # Probabilidad de éxito en cada ensayo
+
+# Variable Aleatoria
+k=0:n # Posibles números de éxitos en los 'n' ensayos
+
+# Definiendo el Coeficiente Binomial:
+coef_bin <- function(a,b){
+  result=factorial(a)/(factorial(b)*(factorial(a-b)))
+  return(result)
+}
+
+# Función de masa de probabilidad Binomial:
+prob_binom <- coef_bin(n,k)*(theta^k)*((1-theta)^(n-k))
+
+cbind(k,prob_binom)
+
+``` 
+
+$~$
+
+*Es común que `R`, al igual que otros paquetes de cómputo estadístico, presente algunos resultados en **notación científica**. Esta notación es una forma compacta de escribir números muy grandes o números muy pequeños. Específicamente, el número después de la letra **e**, que puede ser negativo o positivo, indica **la potencia de 10** por la que hay que multiplicar la cantidad antes de **e** para expresar el número en **notación decimal**.*
+
+*Por ejemplo, para escribir nueve millones doscientos treinta y cuatro mil:*
+$$9234000=9.234*1000000=9.234*10^6=9.234\text{e+6}$$
+
+*O para escribir cincuenta y seis diezmilésimas:*
+$$0.0056=5.6*0.001=5.6*\frac{1}{1000}=5.6*\frac{1}{10^3}=5.6*10^{-3}=5.6\text{e-3}$$
+
+*Es decir, el número después de la letra **e** indica cuántas posiciones a la derecha (si el signo es positivo) o a la izquierda (si el signo es negativo) debe moverse el punto decimal de la base en notación científica para expresar la cantidad en notación decimal.*
