@@ -18,7 +18,7 @@ geom_dist <- function(va, prob) {
 
 expected_value <- function(x, p_dist) {
   # Esperanza matematica
-  # La suma de cada uno de los valores de la distribucion 
+  # La suma de cada uno de los valores de la distribucion
   # por su valor en la distribucion de probabilidad
   return(sum(x*p_dist))
 }
@@ -42,6 +42,27 @@ ggplot(data = tibb_data, aes(x = x, y = p_dist)) +
   ylim(0, max(p_dist) + .001) +
   labs(title = "Distribucion geometrica", x = "Ensayos", y = "Probabilidad") +
   theme(plot.title = element_text(hjust = 0.5))
+
+probs <- c(0.5, 0.01, 0.25)
+
+df <- tibble(x = x)
+for (i in probs) {
+  pmf <- geom_dist(x, i)
+  name <- sprintf("y%0.2f", i)
+  df[[name]] <- pmf
+  # print(df)
+}
+
+ggplot(data = df, aes(x = x)) +
+  geom_point(mapping = aes(y = y0.50), color = "red") + geom_line(mapping = aes(y = y0.50), color = "red") +
+  geom_point(mapping = aes(y = y0.01), color = "blue") + geom_line(mapping = aes(y = y0.01), color = "blue") +
+  geom_point(mapping = aes(y = y0.25), color = "darkgreen") + geom_line(mapping = aes(y = y0.25), color = "darkgreen") +
+  labs(title = "Distribucion geometrica") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  annotate("rect", xmin = 35, xmax = 42, ymin = 0.3, ymax = 0.45, alpha = 0.15) +
+  annotate("text", x = 38, y = .42, label = "* p = 0.5", color = "red", size = 3.8) +
+  annotate("text", x = 38, y = .38, label = "* p = 0.01", color = "blue", size = 3.8) +
+  annotate("text", x = 38, y = .34, label = "* p = 0.25", color = "darkgreen", size = 3.8)
 
 plot(NULL,
      ylim = c(0,.5),
@@ -71,10 +92,6 @@ legend(40, .4,
                16,
                17)
        )
-
-text(6, .10, paste(round(prob_aprob, 4)), col = "darkgreen", cex = 1.4)
-text(5, .30, paste(round(prob_repr, 4)), col = "red", cex = 1.4)
-mtext('Distribucion binomial', 3, line=2, col='blue')
-mtext(paste('Aprobar un examen de ', n, ' aciertos con prob. exito de ', theta), 3, line=.5, col='red')
+mtext('Distribucion geometrica', 3, line=2, col='blue')
 
 
