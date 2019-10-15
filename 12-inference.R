@@ -1,5 +1,6 @@
 ############################
 # Inferencia estadistica 2 #
+#    modelo geometrico     #
 ############################
 
 rm(list = ls())
