@@ -43,5 +43,10 @@ for (indice in 1:length(x_observada)) {
     P_x[pos] <- sum(P_X_theta[, pos], na.rm = TRUE)
   }
 }
-plot(x, P_x, type = 'h')
-plot(theta, P_theta, type = 'h')
+
+# Distribucion de los datos observados
+dist_x <- c(8, 0, 0, 1, 0, 1)/10
+
+plot(x[x < 6], P_x[x < 6], type = 'o', ylim = c(0, 1))
+points(x[x < 6], dist_x, type = 'o', col = "darkgreen")
+title("Distribucion de las observaciones en X y Distribucion marginal de X")

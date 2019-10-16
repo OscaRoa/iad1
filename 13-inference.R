@@ -61,9 +61,6 @@ for (indice in 1:(length(x_observada))) {
   
   # Verosimilitud
   points(theta, P_x_d_theta[, pos], type = 'l', pch = 16, col = "#0000ff44")
-  
-  plot(x, P_x_d_theta[x_obs, ], type = "o")
-  points(x,  P_theta_d_x[x_obs], type = "o")
 }
 
 # Graficas tridimensional de las matrices
