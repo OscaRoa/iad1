@@ -4,12 +4,10 @@ color_prior <- '#ee8800'
 color_likelihood <- '#00dd00'
 color_posterior <- '#ee3300'
 
-# Como utilizaremos el modelo Hypergeométrico,
-# sabemos que es necesario programar el coeficiente binomial:
-coef_bin <- function(a,b){
-  result=factorial(a)/(factorial(b)*(factorial(a-b)))
-  return(result)
-}
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+
+# Funciones
+source("distributions/pmf.R") # Funciones de masa de probabilidad
 
 # Parámetros conocidos
 k <- 5
@@ -17,73 +15,73 @@ k <- 5
 x <- 0:k # Posbiles cantidades de vaquitas hembra en la muestra de tamaño k
 
 
-
 # Parámetros desconocidos y no-observables
 m <- 0:20 # Vaquitas hembra
 n <- 0:30 # Vaquitas macho
 
+prior_type <- 1
 
-# 1. Primer posible PRIOR (uniforme)
-P_m <- rep(1/length(m),length(m))
-P_n <- rep(1/length(n),length(n))
-# 2. Otro posible PRIOR (informado sobre cada variable 'por separado')
-# P_m <- coef_bin(20,m)*0.3^m*(1-0.3)^(20-m)
-# P_n <- coef_bin(30,n)*0.7^n*(1-0.7)^(30-n)
-# Prior sobre m Y n:
-prior_mn <- array(dim=c(length(m),
-                        length(n)))
-# suponiendo independencia entre m y n a priori
-for(hyp_m in m){
-  for(hyp_n in n){
-    position_m <- which(m==hyp_m)
-    position_n <- which(n==hyp_n)
-    prior_mn[position_m,position_n] <- P_m[position_m]*P_n[position_n]
+if (prior_type == 1) {
+  # 1. Primer posible PRIOR (uniforme)
+  P_m <- rep(1/length(m),length(m))
+  P_n <- rep(1/length(n),length(n))
+  prior_mn <- array(dim=c(length(m),
+                          length(n)))
+} else if (prior_type == 2) {
+  # 2. Otro posible PRIOR (informado sobre cada variable 'por separado')
+  P_m <- coef_bin(20,m)*0.3^m*(1-0.3)^(20-m)
+  P_n <- coef_bin(30,n)*0.7^n*(1-0.7)^(30-n)
+  prior_mn <- array(dim=c(length(m),
+                          length(n)))
+} else if (prior_type == 3) {
+  prior_mn <- array(dim=c(length(m),
+                          length(n)))
+  for(hyp_m in m){
+    for(hyp_n in n){
+      position_m <- which(m==hyp_m)
+      position_n <- which(n==hyp_n)
+      expected_n <- round(hyp_m*1.5)
+      prediction_error <- abs(n[position_n]-expected_n)
+      if(prediction_error<=1){
+        peso <- 10
+      }
+      else if(prediction_error<=3){
+        peso <- 8
+      }
+      else if(prediction_error<=6){
+        peso <- 4
+      }
+      else if(prediction_error<=10){
+        peso <- 2
+      }
+      else{
+        peso <- 1
+      }
+      prior_mn[position_m,position_n] <- peso
+    }
+  }
+  # Al terminar la iteración, prior_mn está lleno de enteros:
+  prior_mn
+  # Reescalando:
+  prior_mn <- prior_mn/sum(prior_mn)
+  # Extrayendo las distribuciones a priori marginales:
+  P_m <- apply(prior_mn,MARGIN = 1,FUN=sum)
+  P_n <- apply(prior_mn,MARGIN = 2,FUN=sum)
+}
 
+if (prior_type == 1 | prior_type == 2) {
+  # suponiendo independencia entre m y n a priori
+  for(hyp_m in m){
+    for(hyp_n in n){
+      position_m <- which(m==hyp_m)
+      position_n <- which(n==hyp_n)
+      prior_mn[position_m,position_n] <- P_m[position_m]*P_n[position_n]
+    }
   }
 }
 
-
-# # 3. Y otro posible PRIOR (informado sobre la *relación* entre m y n)
-# # Prior sobre m Y n:
-# prior_mn <- array(dim=c(length(m),
-#                         length(n)))
-# for(hyp_m in m){
-#   for(hyp_n in n){
-#     position_m <- which(m==hyp_m)
-#     position_n <- which(n==hyp_n)
-#     expected_n <- round(hyp_m*1.5)
-#     prediction_error <- abs(n[position_n]-expected_n)
-#     if(prediction_error<=1){
-#       peso <- 10
-#     }
-#     else if(prediction_error<=3){
-#       peso <- 8
-#     }
-#     else if(prediction_error<=6){
-#       peso <- 4
-#     }
-#     else if(prediction_error<=10){
-#       peso <- 2
-#     }
-#     else{
-#       peso <- 1
-#     }
-#     prior_mn[position_m,position_n] <- peso
-# 
-#   }
-# }
-# # Al terminar la iteración, prior_mn está lleno de enteros:
-# prior_mn
-# # Reescalando:
-# prior_mn <- prior_mn/sum(prior_mn)
-# # Extrayendo las distribuciones a priori marginales:
-# P_m <- apply(prior_mn,MARGIN = 1,FUN=sum)
-# P_n <- apply(prior_mn,MARGIN = 2,FUN=sum)
-
-
-
 # Examiando la distribución conjunta a priori:
-try(dev.off())
+# try(dev.off())
 persp(x = m,y = n,z=prior_mn,
       zlim=c(0,.04),
       col=paste(color_prior,'88',sep=''),
@@ -102,15 +100,14 @@ for(hyp_m in m){
   for(hyp_n in n){
     position_m <- which(m==hyp_m)
     position_n <- which(n==hyp_n)
-    P_x_d_mn[position_m,position_n,] <- coef_bin(hyp_m,x)*coef_bin(hyp_n,k-x)/coef_bin(hyp_m+hyp_n,k)
+    P_x_d_mn[position_m,position_n,] <- hipergeom_dist(x, hyp_m, hyp_n, k)
     P_xmn[position_m,position_n,] <- P_x_d_mn[position_m,position_n,]*prior_mn[position_m,position_n]
   }
 }
 
-mat_plot <- rbind(1:3,
+plot_matrix <- rbind(1:3,
                   4:6)
-x11(width = 12, height = 8)
-layout(mat_plot)
+layout(plot_matrix)
 
 # Podemos examinar el 'cubo' de verosimilitud cortando 'rebanadas' respecto de x:
 for (i in x) {
@@ -122,7 +119,7 @@ for (i in x) {
 # O examinando combinaciones entre m y n:
 plot(x,P_x_d_mn[8,6,],type='h',lwd=10,col=color_likelihood)
 
-layout(mat_plot)
+layout(plot_matrix)
 # También podemos examinar el 'cubo' conjunto cortando 'rebanadas' respecto de x:
 for (i in x) {
   persp(x = m,y = n,z=P_xmn[,,i+1],
@@ -134,11 +131,7 @@ for (i in x) {
 
 # La distribución conjunta entre las tres variables observables 'contiene'
 # la incertidumbre marginal sobre x:
-P_x <- array(dim=length(x))
-for(x_posible in x){
-  position_x <- which(x==x_posible)
-  P_x[position_x] <- sum(P_xmn[,,position_x],na.rm=T) # Sumando 'rebanadas' de la conjunta
-}
+(P_x <- apply(P_xmn, MARGIN = 3, FUN = sum, na.rm = T))
 # Examinando la incertidumbre a priori sobre la variable observable (resultado de las
 # suposiciones iniciales sobre las no-observables y sobre el modelo que las relaciona
 # con la observable):
@@ -166,16 +159,8 @@ persp(x = m,y = n,z=posterior_mn_d_x,
 
 # En tanto que la distribución posterior ES una distribución conjunta (sobre las posibles combinaciones
 # entre m y n), contiene la incertidumbre marginal (posterior) sobre cada una de dichas variables:
-posterior_m_d_x <- array(dim=length(m))
-for(m_pos in m){
-  position_m <- which(m==m_pos)
-  posterior_m_d_x[position_m] <- sum(posterior_mn_d_x[position_m,],na.rm=T)
-}
-
-# ...o bien, utilizando la función 'apply':
-apply(posterior_mn_d_x,MARGIN=1,FUN=sum,na.rm=T)
-# ...lo cual ahorra todo el ciclo for. Para calcular la posterior marginal sobre n, por ejemplo: 
-posterior_n_d_x <- apply(posterior_mn_d_x,MARGIN=2,FUN=sum,na.rm=T)
+(posterior_m_d_x <-  apply(posterior_mn_d_x,MARGIN=1,FUN=sum,na.rm=T))
+(posterior_n_d_x <- apply(posterior_mn_d_x,MARGIN=2,FUN=sum,na.rm=T))
 
 # Comparando la incertidumbre marginal posterior sobre cada variable no-observable:
 par(mar=c(4,4,1,1))
