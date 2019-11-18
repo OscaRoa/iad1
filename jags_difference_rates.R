@@ -58,29 +58,30 @@ bayes <- jags(data = var_observables,
 
 nodos <- bayes$BUGSoutput$sims.list
 
-# Prior theta histograms
-layout(1)
-hist(nodos$delta_prior, freq = F)
-layout(1:2,
-       2:3)
-hist(nodos$theta_1_prior, freq = F, xlim = c(0,1))
-hist(nodos$theta_2_prior, freq = F, xlim = c(0,1))
+# Graficas
+prior_color = rgb(0, 0.85, 0)
+post_color = rgb(0.85, 0, 0)
 
-# Posterior theta histograms
-layout(1)
-hist(nodos$delta_post, freq = F)
-layout(1:2,
-       2:3)
-hist(nodos$theta_1_post, freq = F, xlim = c(0,1))
-hist(nodos$theta_2_post, freq = F, xlim = c(0,1))
+# Delta post & prior
+layout(1:2, 2:3)
+hist(nodos$delta_prior, freq = F, col = prior_color, xlim = c(-1, 1), main = "Delta prior")
+hist(nodos$delta_post, freq = F, col = post_color, xlim = c(-1, 1), main = "Delta post")
 
-# Prior k results
-hist(nodos$k1_prior, freq = F)
-hist(nodos$k2_prior, freq = F)
+# Theta 1, theta 2 post & prior
+plot_mat <- rbind(1:2, 3:4)
+layout(plot_mat)
+hist(nodos$theta_1_prior, freq = F, xlim = c(0,1), main = "Theta 1 prior", col = prior_color)
+hist(nodos$theta_1_post, freq = F, xlim = c(0,1), main = "Theta 1 post", col = post_color)
 
-# Posterior k results
-hist(nodos$k1_post, freq = F)
-hist(nodos$k2_post, freq = F)
+hist(nodos$theta_2_prior, freq = F, xlim = c(0,1), main = "Theta 2 prior", col = prior_color)
+hist(nodos$theta_2_post, freq = F, xlim = c(0,1), main = "Theta 2 post", col = post_color)
+
+# K1, K2 post & prior
+hist(nodos$k1_prior, freq = F, main = "K1 prior", col = prior_color)
+hist(nodos$k1_post, freq = F, main = "K1 post", col = post_color)
+
+hist(nodos$k2_prior, freq = F, main = "K2 prior", col = prior_color)
+hist(nodos$k2_post, freq = F, main = "K2 post", col = post_color)
 
 # ¿Deberíamos de creer que la probabilidad de éxito de la moneda
 # es *diferente* a la probabilidad de éxito de la tachuela?
