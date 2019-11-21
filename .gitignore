@@ -44,6 +44,8 @@ vignettes/*.pdf
 # R package: bookdown caching files
 /*_files/
 
-# End of https://www.gitignore.io/api/R
+# Linux specific dirs
 .directory
-model_name.bug
+
+# JAGS output models
+*.bug
