@@ -3,28 +3,33 @@ library("R2jags")
 setwd("~/Documents/fac/iad1/")
 ages <- read.csv("data/edades.csv")
 
-# Varianza = sigma ** 2
+# Varianza = sigma**2
 # Precision = lambda = 1/(sigma**2)
-# pdf <- (1/(sigma*(2 * pi)**1/2))*exp(-((x - mu)**2)/(2*sigma**2))
+# pdf <- (1/(sigma * (2 * pi)**1/2)) * exp(-((x - mu)**2)/(2 * sigma**2))
 # pdf <- dnorm(x, mu, sigma)
 
 # plot(x, pdf, col = 'orange', type = 'l', lwd = 5)
 
 
-
 x <- ages$edad
-# x <- rep(20.6, 100)
 n_edades <- length(x)
-# sigma <- 1.0
 
 observables <- list('x', 'n_edades')
-unobservables <- c('mu', 'lambda', 'sigma')
+unobservables <- c('mu_prior', 'lambda_prior', 'sigma_prior',
+                   'mu_post', 'lambda_post', 'sigma_post',
+                   'x_post', 'x_prior')
 
 write("
       model{
-        mu ~ dnorm(0, 0.001)
-        sigma ~ dunif(0, 10)
-        lambda <- 1/pow(sigma, 2)
+        # Prior 
+        mu_prior ~ dnorm(0, 0.001)
+        sigma_prior ~ dunif(0, 10)
+        lambda_prior <- 1/pow(sigma_prior, 2)
+        
+        # Post
+        mu_post~ dnorm(0, 0.001)
+        sigma_post ~ dunif(0, 10)
+        lambda_post <- 1/pow(sigma_post, 2)
         # Datos
         for (i in 1:n_edades) {
           # Ejercicio 4.1.3
@@ -34,9 +39,10 @@ write("
           # x[i] ~ dnorm(0, lambda)
           
           # Sin condiciones
-          x[i] ~ dnorm(mu, lambda)
-          x_post[i] ~ dnorm(mu, lambda)
+          x[i] ~ dnorm(mu_post, lambda_post)
         }
+        x_post ~ dnorm(mu_post, lambda_post)
+        x_prior ~ dnorm(mu_prior, lambda_prior)
       }
       ", "ages.bug")
 
@@ -56,21 +62,49 @@ nds <- bayes$BUGSoutput$sims.list
 layout(matrix(1:4, nrow = 2))
 par(mar = rep(4, 4))
 
+# Plot con las predicciones posteriores
 hist(
   x,
   xlim = c(min(x), max(x)), 
   freq = F
 )
 hist(
-  nds$mu,
+  nds$mu_post,
   xlim = c(min(x), max(x)),
   freq = F
 )
 hist(
-  nds$sigma,
+  nds$x_post,
+  freq = F
+)
+hist(
+  nds$sigma_post,
   freq = F
 )
 
-layout(1)
+# Plot con las predicciones prior
+hist(
+  nds$x_prior,
+  freq = F
+)
+hist(
+  nds$mu_prior,
+  freq = F
+)
+hist(
+  nds$sigma_prior,
+  freq = F
+)
 
-plot(nds$mu, nds$sigma)
+# Plots de las conjuntas prior y posteriores de sigma y mu
+layout(matrix(1:2, ncol = 2))
+plot(
+  nds$mu_post,
+  nds$sigma_post,
+  main = "P(mu_post, sigma_post)"
+  )
+plot(
+  nds$mu_prior,
+  nds$sigma_prior,
+  main = "P(mu_prior, sigma_prior)"
+  )
